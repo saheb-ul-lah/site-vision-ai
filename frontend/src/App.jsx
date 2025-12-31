@@ -1,12 +1,67 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Loader2, Search, CheckCircle } from 'lucide-react';
+import { 
+  Search, 
+  Cpu, 
+  Globe, 
+  ShieldCheck, 
+  Zap, 
+  MessageSquare, 
+  MapPin, 
+  Phone, 
+  Mail, 
+  Terminal,
+  Activity
+} from 'lucide-react';
+import './App.css';
 
 function App() {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
+  
+  // Terminal Logs State
+  const [logs, setLogs] = useState([]);
+  const logsEndRef = useRef(null);
+
+  // Auto-scroll terminal
+  useEffect(() => {
+    logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [logs]);
+
+  // Simulation of "Real-time" Scanning Steps
+  const simulateLoadingLogs = () => {
+    const steps = [
+      "Initializing Puppeteer Protocol...",
+      "Connecting to headless browser instance...",
+      "Navigating to target URL...",
+      "Bypassing SSL/TLS verification...",
+      "Waiting for network idle state...",
+      "Capturing full-page viewport screenshot...",
+      "Compressing image data (JPEG 70%)...",
+      "Encoding Base64 payload...",
+      "Connecting to Llama-4 Vision API...",
+      "Analyzing semantic structure...",
+      "Extracting business entities...",
+      "Parsing JSON response...",
+      "Finalizing data package..."
+    ];
+
+    let currentStep = 0;
+    setLogs(["System Ready. Initiating Scan..."]);
+
+    const interval = setInterval(() => {
+      if (currentStep < steps.length) {
+        setLogs(prev => [...prev, `> ${steps[currentStep]}`]);
+        currentStep++;
+      } else {
+        clearInterval(interval);
+      }
+    }, 1200);
+
+    return interval;
+  };
 
   const handleAnalyze = async (e) => {
     e.preventDefault();
@@ -15,115 +70,180 @@ function App() {
     setLoading(true);
     setError('');
     setData(null);
+    const logInterval = simulateLoadingLogs();
 
     try {
       const response = await axios.post('http://localhost:5000/api/analyze', { url });
-      setData(response.data);
+      clearInterval(logInterval);
+      setLogs(prev => [...prev, "✔ SCAN COMPLETE. DATA RETRIEVED."]);
+      
+      setTimeout(() => {
+        setData(response.data);
+        setLoading(false);
+      }, 800);
+
     } catch (err) {
+      clearInterval(logInterval);
+      setLogs(prev => [...prev, "❌ CRITICAL ERROR: Connection Failed."]);
       setError(err.response?.data?.error || 'Failed to analyze website');
-    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8 font-sans">
-      <div className="max-w-3xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Site Vision AI</h1>
-          <p className="text-gray-500">Extract business data from any website using AI.</p>
+    <div className="app-main">
+      <div className="cyber-grid"></div>
+      <div className="glow-overlay"></div>
+
+      <div className="app-container">
+        
+        {/* HEADER */}
+        <header className="header-section">
+          <div className="system-badge">
+            <span className="status-dot"></span>
+            <span className="system-text">System Online</span>
+          </div>
+          
+          <h1 className="main-title">SITE VISION AI</h1>
+          <p className="subtitle">
+            Autonomous web reconnaissance & structural data extraction.
+          </p>
+        </header>
+
+        {/* INPUT SECTION */}
+        <div className="search-container">
+          <form onSubmit={handleAnalyze}>
+            <div className="input-wrapper">
+              <div className="input-icon">
+                <Globe size={24} />
+              </div>
+              <input
+                type="url"
+                placeholder="Enter Target URL (https://...)"
+                className="url-input"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                disabled={loading}
+              />
+              <button
+                type="submit"
+                disabled={loading}
+                className="analyze-btn"
+              >
+                {loading ? <Activity className="spin" size={20} /> : <Search size={20} />}
+                <span>ANALYZE</span>
+              </button>
+            </div>
+          </form>
         </div>
 
-        {/* Input Form */}
-        <form onSubmit={handleAnalyze} className="flex gap-2 mb-8 shadow-sm">
-          <input
-            type="url"
-            placeholder="https://example.com"
-            className="flex-1 p-4 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            required
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-blue-600 text-white px-8 rounded-r-lg font-medium hover:bg-blue-700 disabled:bg-blue-300 flex items-center gap-2"
-          >
-            {loading ? <Loader2 className="animate-spin" /> : <Search size={20} />}
-            {loading ? 'Analyzing...' : 'Analyze'}
-          </button>
-        </form>
+        {/* LOADING TERMINAL */}
+        {loading && (
+          <div className="terminal-card">
+            <div className="terminal-header">
+              <Terminal size={14} />
+              <span>Terminal Output</span>
+            </div>
+            <div className="terminal-body">
+              {logs.map((log, index) => (
+                <div key={index} className={`log-entry ${index === logs.length - 1 ? 'active cursor' : ''}`}>
+                  {log}
+                </div>
+              ))}
+              <div ref={logsEndRef} />
+            </div>
+          </div>
+        )}
 
-        {/* Error Message */}
+        {/* ERROR DISPLAY */}
         {error && (
-          <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-6 border border-red-200">
-            {error}
+          <div className="error-box">
+            <ShieldCheck size={24} />
+            <span>{error}</span>
           </div>
         )}
 
-        {/* Results */}
-        {data && (
-          <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
-            <div className="bg-blue-50 p-4 border-b border-blue-100 flex items-center gap-2">
-              <CheckCircle className="text-green-600" size={20} />
-              <h2 className="font-bold text-lg text-gray-800">
-                {data.business_name || 'Analysis Result'}
-              </h2>
+        {/* RESULTS GRID */}
+        {data && !loading && (
+          <div className="results-grid">
+            
+            {/* Business Identity Card */}
+            <div className="glass-card card-identity">
+              <span className="label-sm">Identified Entity</span>
+              <h2 className="business-name">{data.business_name || "Unknown Entity"}</h2>
+              <a href={data.url} target="_blank" rel="noreferrer" style={{ color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '5px', textDecoration: 'none' }}>
+                {data.url} <Zap size={14} color="#06b6d4" />
+              </a>
             </div>
 
-            <div className="p-6 space-y-6">
-              
-              {/* About Section */}
-              <section>
-                <h3 className="text-sm uppercase tracking-wide text-gray-400 font-bold mb-2">About</h3>
-                <p className="text-gray-700 leading-relaxed bg-gray-50 p-3 rounded-lg">
-                  {data.about_section || 'No about section detected.'}
-                </p>
-              </section>
-
-              {/* Contact Info */}
-              <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <span className="text-xs font-bold text-gray-400 block">Email</span>
-                  <span className="text-sm text-gray-800 break-all">{data.contact?.email || 'N/A'}</span>
-                </div>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <span className="text-xs font-bold text-gray-400 block">Phone</span>
-                  <span className="text-sm text-gray-800">{data.contact?.phone || 'N/A'}</span>
-                </div>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <span className="text-xs font-bold text-gray-400 block">Address</span>
-                  <span className="text-sm text-gray-800">{data.contact?.address || 'N/A'}</span>
-                </div>
-              </section>
-
-              {/* FAQ Section */}
-              {data.faq && data.faq.length > 0 && (
-                <section>
-                  <h3 className="text-sm uppercase tracking-wide text-gray-400 font-bold mb-3">FAQ</h3>
-                  <div className="space-y-3">
-                    {data.faq.map((item, idx) => (
-                      <div key={idx} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
-                        <p className="font-semibold text-gray-800 mb-1">Q: {item.question}</p>
-                        <p className="text-gray-600 text-sm">A: {item.answer}</p>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              )}
-
-              {/* Raw JSON View (Optional) */}
-              <details className="mt-4 text-xs text-gray-400">
-                <summary className="cursor-pointer hover:text-gray-600">View Raw JSON</summary>
-                <pre className="bg-gray-900 text-green-400 p-4 rounded-lg mt-2 overflow-auto">
-                  {JSON.stringify(data, null, 2)}
-                </pre>
-              </details>
-
+            {/* About Section */}
+            <div className="glass-card card-about">
+              <div className="section-title">
+                <ShieldCheck size={24} color="#06b6d4" />
+                <h3>Mission / About</h3>
+              </div>
+              <p className="text-content">
+                {data.about_section || "No descriptive data found in the neural scan."}
+              </p>
             </div>
+
+            {/* Contact Grid */}
+            <div className="card-contacts">
+              <div className="glass-card contact-item">
+                <div className="icon-box"><Mail size={20} /></div>
+                <div>
+                  <span className="label-sm" style={{ marginBottom: '2px' }}>Email Protocol</span>
+                  <span style={{ fontSize: '0.9rem', wordBreak: 'break-all' }}>{data.contact?.email || "N/A"}</span>
+                </div>
+              </div>
+
+              <div className="glass-card contact-item">
+                <div className="icon-box"><Phone size={20} style={{ color: '#a855f7' }} /></div>
+                <div>
+                  <span className="label-sm" style={{ marginBottom: '2px' }}>Comm Link</span>
+                  <span>{data.contact?.phone || "N/A"}</span>
+                </div>
+              </div>
+
+              <div className="glass-card contact-item">
+                <div className="icon-box"><MapPin size={20} style={{ color: '#ec4899' }} /></div>
+                <div>
+                  <span className="label-sm" style={{ marginBottom: '2px' }}>Coordinates</span>
+                  <span style={{ fontSize: '0.9rem' }}>{data.contact?.address || "N/A"}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* FAQ Section */}
+            {data.faq && data.faq.length > 0 && (
+              <div className="card-faq-container">
+                <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <MessageSquare size={28} color="#a855f7" />
+                  <h3 style={{ fontSize: '1.5rem', fontFamily: 'var(--font-heading)', fontWeight: '700' }}>Common Queries</h3>
+                </div>
+                
+                <div className="faq-grid">
+                  {data.faq.map((item, idx) => (
+                    <div key={idx} className="faq-item">
+                      <span className="faq-question"><span style={{ color: '#06b6d4' }}>Q.</span> {item.question}</span>
+                      <p className="faq-answer">{item.answer}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Footer Data */}
+            {data.footer_text && (
+               <div className="glass-card card-footer">
+                  <span style={{ color: '#06b6d4', fontWeight: 'bold' }}>FOOTER_DATA_STREAM: </span>
+                  {data.footer_text.substring(0, 150)}...
+               </div>
+            )}
+
           </div>
         )}
+
       </div>
     </div>
   );
