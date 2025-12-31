@@ -1,0 +1,3 @@
+git add .
+git commit -m "feat: create mongoose schema for site data"
+git push -u origin main
