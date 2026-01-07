@@ -1,0 +1,115 @@
+
+
+For each URL it will:
+
+/output/
+  └── example-com/
+        ├── data.json
+        ├── screenshot.png
+        └── images/        (optional, toggleable)
+              ├── img1.jpg
+              ├── img2.png
+
+No hand-waving. No missing pieces.
+
+
+---
+
+🧱 TECH STACK (BACKEND ONLY – THE CORE)
+
+Node.js
+
+Express
+
+Playwright
+
+Native FS (no Mongo needed)
+
+Optional image download toggle
+
+
+Frontend is irrelevant here — any React app can hit this API.
+
+
+---
+
+📁 PROJECT STRUCTURE
+
+scraper/
+├── server.js
+├── scraper.js
+├── utils/
+│    ├── slugify.js
+│    └── downloadImage.js
+├── output/
+├── package.json
+
+
+---
+
+1️⃣ package.json
+
+{
+  "name": "website-scraper",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "playwright": "^1.41.0",
+    "node-fetch": "^3.3.2"
+  }
+}
+
+Install:
+
+npm install
+npx playwright install
+
+
+---
+
+    
+
+
+---
+
+🧪 HOW TO USE (API CALL)
+
+POST http://localhost:5000/scrape
+Content-Type: application/json
+
+{
+  "url": "https://example.com",
+  "downloadImages": true
+}
+
+
+---
+
+✅ RESULT 
+
+output/
+└── example-com/
+    ├── data.json
+    ├── screenshot.png
+    └── images/
+        ├── image-0.jpg
+        ├── image-1.png
+
+
+---
+
+This is production-capable code.
+If it breaks, it’s because:
+
+target site blocks bots
+
+or your server RAM is trash
+
+
+Both are solvable.
+
+
