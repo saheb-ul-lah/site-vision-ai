@@ -74,8 +74,10 @@ npm install
 
 **Create a `.env` file** in the `backend` folder:
 ```ini
+
 PORT=5000
 MONGO_URI=mongodb://localhost:27017/site-vision-ai
+
 # Get your free key at https://console.groq.com/keys
 GROQ_API_KEY=gsk_your_actual_key_here
 ```
@@ -99,9 +101,6 @@ Start the Frontend:
 npm run dev
 ```
 
-### 4. Usage
-Open your browser to `http://localhost:5173` (or the port shown in your terminal). Enter a URL and click **ANALYZE**.
-
 ---
 
 ## 📂 Project Structure
@@ -109,32 +108,28 @@ Open your browser to `http://localhost:5173` (or the port shown in your terminal
 ```
 site-vision-ai/
 ├── backend/
-│   ├── services/       # AI & Screenshot logic
-│   ├── controllers/    # API Controllers
-│   ├── models/         # Database Schemas
-│   ├── routes/         # Express Routes
-│   ├── temp/           # Temporary screenshot storage
-│   └── index.js        # Server Entry
+│   ├── services/       
+│   ├── controllers/    
+│   ├── models/         
+│   ├── routes/        
+│   ├── temp/           
+│   └── index.js       
 │
 └── frontend/
     ├── src/
-    │   ├── App.jsx     # Main UI Logic
-    │   ├── App.css     # Cyberpunk Styles
-    │   └── main.jsx    # React Entry
-    └── index.html      # HTML Root
+    │   ├── App.jsx     
+    │   ├── App.css     
+    │   └── main.jsx    
+    └── index.html      
 ```
 
 ## 🤝 Contributing
 
 Contributions are welcome! Please fork the repository and submit a pull request.
 
-## 📜 License
-
-This project is licensed under the MIT License.
-
 ---
 
-## 👨‍💻 How to Clone & Run (Guide for Others)
+## 👨‍💻 How to Clone & Run
 
 If you want to send instructions to a friend or a recruiter on how to run your code on their PC, send them these exact steps:
 
@@ -160,7 +155,7 @@ If you want to send instructions to a friend or a recruiter on how to run your c
     ```
     *   *Create a file named `.env` inside the backend folder and paste your Groq API Key there (see README).*
     *   Run it: `npm run dev`
-5.  **Setup Frontend (New Terminal Window):**
+5.  **Setup Frontend :**
     ```bash
     cd frontend
     npm install
